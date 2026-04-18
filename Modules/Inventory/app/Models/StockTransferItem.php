@@ -4,6 +4,8 @@ namespace Modules\Inventory\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Inventory\Database\Factories\StockTransferItemFactory;
+
 // use Modules\Inventory\Database\Factories\StockTransferItemFactory;
 
 class StockTransferItem extends Model
@@ -44,5 +46,9 @@ class StockTransferItem extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+    protected static function newFactory(): StockTransferItemFactory
+    {
+        return StockTransferItemFactory::new();
     }
 }

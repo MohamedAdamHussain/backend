@@ -32,16 +32,16 @@ class RolesAndPermissionsSeeder extends Seeder
                 'view-warehouses', 'create-warehouses', 'edit-warehouses', 'delete-warehouses',
                 'view-suppliers', 'create-suppliers', 'edit-suppliers', 'delete-suppliers',
                 'view-supply-orders', 'create-supply-orders', 'complete-supply-orders', 'cancel-supply-orders',
-                'view-stock-transfers', 'create-stock-transfers', 'complete-stock-transfers', 'cancel-stock-transfers',
+                'view-stock-transfers', 'create-stock-transfers', 'transit-stock-transfers','complete-stock-transfers', 'cancel-stock-transfers',
                 'view-inventory-counts', 'create-inventory-counts', 'complete-inventory-counts', 'cancel-inventory-counts',
             ],
             // Sales
             'sales' => [
                 'view-customers', 'create-customers', 'edit-customers', 'delete-customers',
                 'view-price-lists', 'create-price-lists', 'edit-price-lists', 'delete-price-lists',
-                'view-sale-orders', 'create-sale-orders', 'complete-sale-orders', 'cancel-sale-orders','accept-sale-orders','process-sale-orders','ship-sale-orders','complete-sale-orders','cancel-sale-orders',
+                'view-sale-orders', 'create-sale-orders','edit-sale-orders', 'delete-sale-orders','accept-sale-orders','process-sale-orders','ship-sale-orders','complete-sale-orders','cancel-sale-orders',
                 'view-invoices', 'create-invoices', 'pay-invoices', 'cancel-invoices',
-                'view-delivery-orders', 'create-delivery-orders', 'complete-delivery-orders', 'cancel-delivery-orders',
+                'view-delivery-orders', 'create-delivery-orders','ship-delivery-orders', 'complete-delivery-orders', 'cancel-delivery-orders',
             ],
             // HR
             'hr' => [

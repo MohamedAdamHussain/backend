@@ -18,9 +18,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::apiResource('advances', AdvanceController::class);
         Route::apiResource('advance-repayments', AdvanceRepaymentController::class);
         Route::apiResource('salaries', SalaryController::class);
-        Route::prefix('salary')->group(function () {
-            Route::put('paid', [SalaryController::class, 'markAsPaid']);
-            Route::put('unpaid', [SalaryController::class, 'markAsUnpaid']);
+        Route::prefix('salaries/{salary}')->group(function () {
+            Route::put('/mark-paid',   [SalaryController::class, 'markAsPaid']);
+            Route::put('/mark-unpaid', [SalaryController::class, 'markAsUnpaid']);
         });
     });
 });

@@ -4,6 +4,8 @@ namespace Modules\Inventory\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Modules\Inventory\Database\Factories\StockTransferFactory;
+
 // use Modules\Inventory\Database\Factories\StockTransferFactory;
 
 class StockTransfer extends Model
@@ -53,8 +55,12 @@ class StockTransfer extends Model
         return $this->hasMany(StockTransferItem::class);
     }
 
-        public function logs()
-        {
-            return $this->morphMany(InventoryLog::class, 'related');
-        }
+    public function transactions()
+    {
+        return $this->morphMany(InventoryTransaction::class, 'related');
+    }
+    protected static function newFactory(): StockTransferFactory
+    {
+        return StockTransferFactory::new();
+    }
 }

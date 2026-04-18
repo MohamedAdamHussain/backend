@@ -4,6 +4,7 @@ namespace Modules\Inventory\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Inventory\Database\Factories\ProductFactory;
 
 class Product extends Model
 {
@@ -20,13 +21,13 @@ class Product extends Model
     public function warehouses()
     {
         return $this->belongsToMany(Warehouse::class)
-                    ->withPivot('quantity', 'low_stock_alert')
-                    ->withTimestamps();
+            ->withPivot('quantity', 'low_stock_alert')
+            ->withTimestamps();
     }
 
     public function supplierOrderItems()
     {
-        return $this->hasMany(SupplierOrderItem::class);
+        return $this->hasMany(SupplyOrderItem::class);
     }
 
     public function stockTransferItems()
@@ -39,13 +40,13 @@ class Product extends Model
         return $this->hasMany(InventoryCountItem::class);
     }
 
-    public function inventoryLogs()
+    public function inventorytransactions()
     {
-        return $this->hasMany(InventoryLog::class);
+        return $this->hasMany(InventoryTransaction::class);
+    }
+
+    protected static function newFactory(): ProductFactory
+    {
+        return ProductFactory::new();
     }
 }
-
-    // protected static function newFactory(): ProductFactory
-    // {
-    //     // return ProductFactory::new();
-    // }
