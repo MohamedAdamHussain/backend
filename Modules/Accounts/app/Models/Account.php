@@ -3,11 +3,14 @@
 namespace Modules\Accounts\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Modules\Accounts\Models\JournalEntryLine;
 
 class Account extends Model
 {
+    protected $table = 'accounts';
     protected $fillable = [
         'name',
+        'slug',
         'type',
         'parent_id'
     ];

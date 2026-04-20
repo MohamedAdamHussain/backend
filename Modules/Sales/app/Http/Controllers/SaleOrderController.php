@@ -11,10 +11,11 @@ use Illuminate\Support\Facades\Gate;
 use Modules\Sales\Models\DeliveryOrder;
 use Modules\Sales\Models\Invoice;
 use Modules\shared\Http\Traits\ApiResponse;
+use Modules\Shared\Http\Traits\CreatesJournalEntry;
 
 class SaleOrderController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse, CreatesJournalEntry;
 
     public function index(): JsonResponse
     {
@@ -113,14 +114,29 @@ class SaleOrderController extends Controller
         DB::transaction(function () use ($saleOrder) {
             $saleOrder->update(['status' => 'received']);
 
-            // إنشاء الفاتورة تلقائياً
             Invoice::create([
                 'sale_order_id' => $saleOrder->id,
                 'paid_amount'   => 0,
                 'notes'         => null,
             ]);
-        });
 
+            $cost = collect($saleOrder->items)->sum(
+                fn($item) => $item->product->price * $item->quantity
+            );
+
+            $this->createJournalEntry(
+                'بيع - طلب رقم ' . $saleOrder->id,
+                $saleOrder,
+                [
+                    // العملية الأولى — البيع
+                    ['account_id' => $this->getAccountId('receivables'),   'type' => 'debit',  'amount' => $saleOrder->total_amount],
+                    ['account_id' => $this->getAccountId('sales-revenue'), 'type' => 'credit', 'amount' => $saleOrder->total_amount],
+                    // العملية الثانية — التكلفة
+                    ['account_id' => $this->getAccountId('cogs'),          'type' => 'debit',  'amount' => $cost],
+                    ['account_id' => $this->getAccountId('inventory'),     'type' => 'credit', 'amount' => $cost],
+                ]
+            );
+        });
         return $this->successResponse($saleOrder->fresh()->load('invoice'));
     }
 

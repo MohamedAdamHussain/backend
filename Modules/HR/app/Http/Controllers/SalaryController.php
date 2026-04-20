@@ -6,12 +6,14 @@ use Modules\HR\Models\Salary;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Modules\shared\Http\Traits\ApiResponse;
+use Modules\Shared\Http\Traits\CreatesJournalEntry;
 
 class SalaryController extends Controller
 {
-    use ApiResponse;
+    use ApiResponse,CreatesJournalEntry;
     private function calculateNetSalary(Salary $salary): void
     {
         $salary->net_salary = $salary->basic_salary
@@ -96,7 +98,18 @@ class SalaryController extends Controller
         if ($salary->payment_status === 'paid') {
             return $this->errorResponse('Salary already paid', 400);
         }
+        DB::transaction(function () use ($salary) {
+            $this->createJournalEntry(
+                'دفع راتب رقم ' . $salary->id,
+                $salary,
+                [
+                    ['account_id' => $this->getAccountId('salaries-expense'), 'type' => 'debit',  'amount' => $salary->net_salary],
+                    ['account_id' => $this->getAccountId('cash'),             'type' => 'credit', 'amount' => $salary->net_salary],
+                ]
+            );
 
+            $salary->update(['payment_status' => 'paid']);
+        });
         $salary->update(['payment_status' => 'paid']);
         return $this->successResponse($salary->fresh());
     }

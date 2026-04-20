@@ -11,14 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('journal_entry_lines', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('journal_entry_id')->constrained()->onDelete('cascade');
-            $table->foreignId('account_id')->constrained()->onDelete('restrict');
-            $table->enum('type', ['debit', 'credit']);
-            $table->decimal('amount', 15, 2);
-            $table->timestamps();
-        });
+            Schema::create('journal_entry_lines', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('journal_entry_id')->constrained()->onDelete('cascade');
+                $table->foreignId('account_id')->constrained()->onDelete('restrict');
+                $table->enum('type', ['debit', 'credit']);
+                $table->decimal('amount', 15, 2);
+                $table->timestamps();
+            });
     }
 
     /**

@@ -9,12 +9,13 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Modules\Inventory\Models\SupplyOrder;
 use Modules\Shared\Http\Traits\ApiResponse;
+use Modules\Shared\Http\Traits\CreatesJournalEntry;
 use Modules\Shared\Http\Traits\LogsInventoryMovement;
 
 class SupplyOrderController extends Controller
 {
 
-    use ApiResponse, LogsInventoryMovement;
+    use ApiResponse, LogsInventoryMovement, CreatesJournalEntry;
 
     public function index(): JsonResponse
     {
@@ -41,7 +42,7 @@ class SupplyOrderController extends Controller
             'items.*.quantity'         => 'required|integer|min:1',
             'items.*.unit_price'       => 'required|numeric|min:0',
         ]);
-
+        /** @var SupplyOrder $order */
         $order = null;
         DB::transaction(function () use ($validated, &$order) {
             $order = SupplyOrder::create([
@@ -95,12 +96,32 @@ class SupplyOrderController extends Controller
         }
         DB::transaction(function () use ($supplyOrder) {
             foreach ($supplyOrder->items as $item) {
-                $this->updateWarehouseStock($supplyOrder->warehouse_id, $item->product_id, +$item->quantity);
-                $this->logInventoryMovement($item->product_id, $supplyOrder->warehouse_id, 'supply', +$item->quantity, $supplyOrder);
+                $this->updateWarehouseStock(
+                    $supplyOrder->warehouse_id,
+                    $item->product_id,
+                    +$item->quantity
+                );
+                $this->logInventoryMovement(
+                    $item->product_id,
+                    $supplyOrder->warehouse_id,
+                    'supply',
+                    +$item->quantity,
+                    $supplyOrder
+                );
             }
-            // Here you would typically update inventory levels based on the order items
+
             $supplyOrder->update(['status' => 'received']);
+
+            $this->createJournalEntry(
+                'استلام بضاعة - طلب رقم ' . $supplyOrder->id,
+                $supplyOrder,
+                [
+                    ['account_id' => $this->getAccountId('inventory'), 'type' => 'debit',  'amount' => $supplyOrder->total_amount],
+                    ['account_id' => $this->getAccountId('suppliers'), 'type' => 'credit', 'amount' => $supplyOrder->total_amount],
+                ]
+            );
         });
+
         return $this->successResponse($supplyOrder);
     }
 

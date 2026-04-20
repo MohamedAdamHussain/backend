@@ -38,7 +38,7 @@
             "Modules\\Sales\\Database\\Seeders\\": "Modules/Sales/Database/seeders/",
             "Modules\\Accounts\\": "Modules/Accounts/app/",
             "Modules\\Accounts\\Database\\Factories\\": "Modules/Accounts/Database/Factories/",
-            "Modules\\Accounts\\Database\\Seeders\\": "Modules/Accounts/Database/seeders/",
+            "Modules\\Accounts\\Database\\Seeders\\": "Modules/Accounts/Database/Seeders/",
             "Modules\\Shared\\": "Modules/Shared/app/"
         }
     },

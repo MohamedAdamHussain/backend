@@ -4,53 +4,57 @@ namespace Modules\Accounts\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
+use Modules\Accounts\Models\Account;
+use Modules\shared\Http\Traits\ApiResponse;
 
 class AccountsController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    use ApiResponse;
+
     public function index()
     {
-        return view('accounts::index');
+        Gate::authorize('view-accounts');
+        return $this->successResponse(Account::paginate(20));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function store(Request $request)
     {
-        return view('accounts::create');
+        Gate::authorize('create-accounts');
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:accounts,id',
+            'name' => 'required|string',
+            'slug' => 'required|string',
+            'type' => 'required|string',
+        ]);
+
+        $account = Account::create($validated);
+        return $this->successResponse($account, 204);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request) {}
-
-    /**
-     * Show the specified resource.
-     */
-    public function show($id)
+    public function show(Account $account)
     {
-        return view('accounts::show');
+        Gate::authorize('view-accounts');
+        return $this->successResponse($account->load('children'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit($id)
+    public function update(Request $request, Account $account)
     {
-        return view('accounts::edit');
+        Gate::authorize('edit-accounts');
+        $validated = $request->validate([
+            'parent_id' => 'nullable|exists:accounts,id',
+            'name' => 'required|string',
+            'slug' => 'required|string',
+            'type' => 'required|string',
+        ]);
+        $account->update($validated);
+        return $this->successResponse($account);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, $id) {}
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy($id) {}
+    public function destroy(Account $account)
+    {
+        Gate::authorize('delete-accounts');
+        $account->delete();
+        return $this->successResponse(null, 204);
+    }
 }
